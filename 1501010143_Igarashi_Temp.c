@@ -77,14 +77,10 @@ int main(int argc, const char * argv[]) {
   printf("---start---");
   println();
 #endif
+  /*変数*/
   int flg_pg=0;
-  struct temparature_type *tempara_p;
-/*
-Segmentation fault: 11
-スタック領域に入らないようだ。。。
-*/
-  struct temparature_type tempara_data_2015[INDEX];  
-  struct temparature_type tempara_data_2014[INDEX]; 
+  struct temparature_type tempara_data_2015[INDEX];
+  struct temparature_type tempara_data_2014[INDEX];
   struct temparature_type tempara_data_2013[INDEX];
   struct temparature_type tempara_data_2012[INDEX];
   struct temparature_type tempara_data_2011[INDEX];
@@ -94,41 +90,22 @@ Segmentation fault: 11
   struct temparature_type tempara_data_2007[INDEX];
   struct temparature_type tempara_data_2006[INDEX];
   struct temparature_type tempara_data_2005[INDEX];
-  struct temparature_type tempara_data_2004[INDEX];
-  struct temparature_type tempara_data_2003[INDEX];
-  struct temparature_type tempara_data_2002[INDEX];
-  struct temparature_type tempara_data_2001[INDEX];
-  struct temparature_type tempara_data_2000[INDEX];
 
+  
+  /*ファイルを読み込む*/
   flg_pg=set_tempara_data( tempara_data_2015, "tempara_2015.dat" );
-  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2014.dat"  );
-  flg_pg=set_tempara_data( tempara_data_2013, "tempara_2013.dat"  );
-  flg_pg=set_tempara_data( tempara_data_2012, "tempara_2012.dat"  );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2014.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2013.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2012.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2011.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2010.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2009.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2008.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2007.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2006.dat" );
+  flg_pg=set_tempara_data( tempara_data_2014, "tempara_2005.dat" );
   
-  /*
-  char *filename="tempara_2011.dat";
-  flg_pg=set_tempara_data( tempara_data_2011, filename );
-
-  flg_pg=set_tempara_data( tempara_data_2010, filename );
-  flg_pg=set_tempara_data( tempara_data_2009, filename );
-  flg_pg=set_tempara_data( tempara_data_2008, filename );
-*/
-
-      //n個分のメモリを確保する
-  /*
-    int n=1;
-
-    tempara_p = malloc( sizeof(struct temparature_type ) * n );
-    if (tempara_p == NULL) {
-        printf( "memory allocation error\n" );
-        exit(EXIT_FAILURE);
-    }
-  flg_pg=set_tempara_data( tempara_p, filename );
-  
-*/
-
-  
-  
+ 
  
   return 0;
 }
@@ -137,20 +114,6 @@ int set_tempara_data(struct temparature_type *tempara_data, char filename[] ){
   int k=0;
   char buf[1000];
   FILE* fp;
-
-/*
-  for(k=0; k<INDEX ; k++){
-    printf("%d\n",k);
-
-    tempara_data[k].month     =0   ;
-    tempara_data[k].day_avg   =0.0 ;
-    tempara_data[k].day_max   =0.0;
-    tempara_data[k].day_min   =0.0 ;
-    tempara_data[k].month_max =0.0 ;
-    tempara_data[k].month_min =0.0;
-
-  }
-  */
 
   printf("%s\n", filename );
   fp = fopen(filename, "r");
