@@ -53,6 +53,8 @@ struct  user_input_type{
     int year;
     int month;
 	int period;
+	int from_year;
+	int to_year;
 	
 	
 };
@@ -260,18 +262,33 @@ int set_input_date_period( struct user_input_type *user_input){
 	int flg_input=0;
 		//入力を受け付け
 		while(1){
-				printf("Please input year from [yyyy]:");
-				flg_input =scanf("%d", &user_input->year);
+				printf("Please input from year[yyyy]:");
+				flg_input =scanf("%d", &user_input->from_year);
 				if(flg_input != 1){
 					scanf("%*s");
 					continue;
 				}else{
-					if( user_input->year >= 2003 &&  user_input->year <= 2016) break;
-					else showErrMsg("year",0.0, user_input->year);
+					//TODO:defineにする
+					if( user_input->from_year >= 2003 &&  user_input->from_year <= 2016) break;
+					else showErrMsg("from year",0.0, user_input->from_year);
 			}
 		}
+		
 		while(1){
-			printf("Please input from month[1-12]:");
+				printf("Please input to year[yyyy]:");
+				flg_input =scanf("%d", &user_input->to_year);
+				if(flg_input != 1){
+					scanf("%*s");
+					continue;
+				}else{
+						//TODO:defineにする
+					if( user_input->to_year >= 2003 &&  user_input->to_year <= 2016) break;
+					else showErrMsg("to year",0.0, user_input->to_year);
+			}
+		}
+		
+		while(1){
+			printf("Please input month[1-12]:");
 			flg_input = scanf("%d", &user_input->month);
 			if(flg_input != 1){
 				scanf("%*s");
@@ -281,35 +298,6 @@ int set_input_date_period( struct user_input_type *user_input){
 				else showErrMsg("month",0.0, user_input->month);
 			}
 		}
-	
-		while(1){
-			printf("Please input period:");
-			flg_input =scanf("%d", &user_input->period);
-			if(flg_input != 1){
-				scanf("%*s");
-				continue;
-			}else{
-				if( user_input->period > 1 &&  user_input->period <= 14) break;
-				else showErrMsg("period",0.0, user_input->period);
-			}
-		}
-
-	/*
-	period:from year - to year
-	2 :2016-2015
-	3 :2016-2014
-	4 :2016-2013
-	5 :2016-2012
-	6 :2016-2011
-	7 :2016-2010
-	8 :2016-2009
-	9 :2016-2008
-	10:2016-2007
-	11:2016-2006
-	12:2016-2005
-	13:2016-2004
-	14:2016-2003
-	*/
 
 	return 0;
 }
@@ -345,7 +333,7 @@ int show_menu(void){
   }
 }
 
-int show_monthly_menu(){
+int show_monthly_menu(void){
   int i_menu;
   int ret;
   while(1){
@@ -377,8 +365,8 @@ int show_monthly_menu(){
   }
 }
 
-//TODO
-int show_find_menu(){
+
+int show_find_menu(void){
   int i_menu;
   int ret;
   while(1){
@@ -413,10 +401,101 @@ int show_find_menu(){
   }
 }
 
+/*
+int find_max_data_sub(){
 
-int find_max_data(){
+
+}
+*/
+
+//TODO:find_max_data本体
+int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, struct temparature_type *temara_data, double *ret_data ){
+	printf("find_max_data-------------------\n");
 	
+	int wk_from_year = user_input->from_year;
+	int period = user_input->from_year - user_input->to_year + 1;
+	int i_end = period;
+	int i_cnt=0;
+	int i=0;
+	int i_start= (user_input->month-1) +12*(2016 - wk_from_year );
+
+
+	double max_val=0.0;
 	
+
+	SUBFINDMENU = SUBFINDMENU_TYPE;
+	switch( SUBFINDMENU ){
+			case FIND_MENU_AGV_DAY :
+				max_val=temara_data[i_start].day_avg;
+
+
+#if DEBUG  == 1
+				printf("Debugging----------------------\n");
+				printf("i[=i_start]=%d\n", i_start);
+				printf("day_avg[=max_val]=%lf\n", max_val);
+				printf("Debugging----------------------\n");	
+#endif
+
+       			printf("SUBFINDMENU=FIND_MENU_AGV_DAY\n");
+       			 while( i_cnt+1 < i_end ){
+					
+					--wk_from_year;		
+					
+        			i=(user_input->month-1) +12*(2016 - wk_from_year ) ;
+        			
+        			
+					printf("day_avg=%lf\n", temara_data[i].day_avg);
+			
+					if(max_val < temara_data[i].day_avg){
+						max_val=temara_data[i].day_avg;
+					}
+
+#if DEBUG  == 1
+					printf("Debugging----------------------\n");
+					printf("day_avg=%lf\n", temara_data[i].day_avg);
+			
+  					printf("i_cnt=%d\n", i_cnt);
+					printf("i=%d\n", i);
+					printf("i_end=%d\n", i_end);
+					println();
+					printf("Debugging----------------------\n");
+  		
+#endif
+					++i_cnt;
+
+				}
+
+
+				break;
+			
+			case FIND_MENU_AGV_MAX:
+				printf("SUBFINDMENU=FIND_MENU_AGV_MAX\n");
+				break;
+			
+			case FIND_MENU_AGV_MIN:
+				printf("SUBFINDMENU=FIND_MENU_AGV_MIN\n");
+				break;
+			
+			case FIND_MENU_MAX_DATA:
+				printf("SUBFINDMENU=FIND_MENU_MAX_DATA\n");
+				break;
+			
+			case FIND_MENU_MIN_DATA:
+				printf("SUBFINDMENU=FIND_MENU_MIN_DATA\n");
+				break;
+			
+			case FIND_MENU_EXIT_SUB:
+				printf("SUBFINDMENU=FIND_MENU_EXIT_SUB\n");
+				break;
+						
+        }	
+	*ret_data=max_val;
+	
+#if DEBUG  == 1	
+	printf("ret_data=%lf", *ret_data );
+#endif
+	
+	return 0; 
 }
 
 int main(int argc, const char * argv[]) {
@@ -559,40 +638,28 @@ int main(int argc, const char * argv[]) {
 			
 			case FIND_MAX_DATA:
 				/*すべて読んでセットしておく*/
-				//各配列は面倒。。。ひとつの配列にまとめる。。。
-				/*
-				set_tempara_data( tempara_data_2016, "tempara_2016.dat" );
-				set_tempara_data( tempara_data_2015, "tempara_2015.dat" );
-				set_tempara_data( tempara_data_2014, "tempara_2014.dat" );
-				set_tempara_data( tempara_data_2013, "tempara_2013.dat" );
-				set_tempara_data( tempara_data_2012, "tempara_2012.dat" );
-				set_tempara_data( tempara_data_2011, "tempara_2011.dat" );
-				set_tempara_data( tempara_data_2010, "tempara_2010.dat" );
-				set_tempara_data( tempara_data_2009, "tempara_2009.dat" );
-				set_tempara_data( tempara_data_2008, "tempara_2008.dat" );
-				set_tempara_data( tempara_data_2007, "tempara_2007.dat" );
-				set_tempara_data( tempara_data_2006, "tempara_2006.dat" );
-				set_tempara_data( tempara_data_2005, "tempara_2005.dat" );
-				set_tempara_data( tempara_data_2004, "tempara_2004.dat" );
-				set_tempara_data( tempara_data_2003, "tempara_2003.dat" );
-				*/
 				//TODO
-				set_tempara_data_all( tempara_data_all, "tempara.dat" );
+				if(set_tempara_data_all( tempara_data_all, "tempara.dat" )!=0){
+					printf("Please set tempara.data.\n");
+					return -1;
 				
+				}
+					
 #if DEBUG  == 1
 				printf("Read all the tempara_data\n");
 #endif
-
-
-				//ユーザーからのインプット情報をセット
-				set_input_date_period(&user_input);
-				//enum enumSUBMENU_FIND{FIND_MENU_AGV_DAY=1, 
-				//FIND_MENU_AGV_MAX=2, 
-				//FIND_MENU_AGV_MIN=3, 
-				//FIND_MENU_MAX_DATA=4, 
-				//FIND_MENU_MIN_DATA=5 EXIT_SUB=9} SUBFINDMENU ;
 				
-				switch(show_find_menu()){
+				/*Sub Menu*/
+				SUBFINDMENU = show_find_menu();
+				
+				/*User Input*/
+				set_input_date_period(&user_input);
+			
+				//TODO:find_max_dataを呼び出し
+				double max_val;
+				find_max_data(SUBFINDMENU, &user_input, tempara_data_all, &max_val);
+						
+				switch( SUBFINDMENU ){
 						case FIND_MENU_AGV_DAY :
 						SUBFINDMENU=FIND_MENU_AGV_DAY;
 						break;
@@ -619,45 +686,9 @@ int main(int argc, const char * argv[]) {
 						
 					}
 
-				double max_2016,max_2015,max_2014,max_2013,max_2012;
-				switch(user_input.period){
-					case 2:
-					printf("for 2 years\n");
-					//FIND_MENU_EXIT_SUBと、配列を渡したら最大値を検索してくれる関数
-					//TODO：方針を変更
-					/*
-					find_max_data(SUBFINDMENU, tempara_data_2016, &max_2016 );
-					printf("max_2016=%lf\n" , max_2016);
-					find_max_data(SUBFINDMENU, tempara_data_2015, &max_2015 );
-					printf("max_2015=%lf\n" , max_2015);
-					if(max_2016 > max_2015){
-						printf("max=%lf\n" , max_2016);
-						
-					}else{
-						printf("max=%lf\n" , max_2015);
-						
-					}
-					*/
-					
-					/*
-					--------------
-					From Year2016
-					To Year:2014
-					Month:4
-					--------------
-					Period:2016-2014+1 =3
-					index:4-1
-					
-					*/
-					find_max_data();
-					
+					//TODO:find_max_data
 					
 					break;
-					
-					
-					
-				}
-				break;
 			}
 		
 		while(1){
