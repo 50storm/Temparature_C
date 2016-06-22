@@ -30,7 +30,8 @@
 
 enum enumMENU {MONTHLY_DATA = 1 , FIND_MAX_DATA = 2, COMPUTE_AVG_DATA = 3,  EXIT = 9, ERR = -1  } MENU ;
 enum enumSUBMENU{AVG_DATA=1, MAX_DATA=2, MIN_DATA=3, ALL_DATA=4, EXIT_SUB=9} SUBMENU ;
-enum enumSUBMENU_FIND{FIND_MENU_AGV_DAY=1, FIND_MENU_AGV_MAX=2, FIND_MENU_AGV_MIN=3, FIND_MENU_MAX_DATA=4, FIND_MENU_MIN_DATA=5, FIND_MENU_EXIT_SUB=9} SUBFINDMENU ;
+enum enumSUBMENU_FIND{FIND_MENU_AGV_DAY=1, FIND_MENU_AGV_MAX=2, FIND_MENU_AGV_MIN=3, FIND_MENU_MAX_DATA=4, FIND_MENU_MIN_DATA=5, FIND_MENU_EXIT_SUB=9} SUB_FIND_MENU ;
+enum enumSUBMENU_CMP_AVG{CMP_AVG_MENU_AGV_DAY=1, CMP_AVG_MENU_AGV_MAX=2, CMP_AVG_MENU_AGV_MIN=3, CMP_AVG_MENU_MAX_DATA=4, CMP_AVG_MENU_MIN_DATA=5, CMP_AVG_EXIT_SUB=9} SUB_CMP_AVG_MENU ;
 
 struct temparature_type{
   int month;
@@ -58,8 +59,8 @@ int set_tempara_data(struct temparature_type *, char [] );
 int set_tempara_data_all(struct temparature_type * , char [] );
 int set_input_date( struct user_input_type * );
 int set_input_date_period( struct user_input_type * );
-int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type * , struct temparature_type * , double * );
-
+int find_max_data(int SUB_FIND_MENU_TYPE, struct user_input_type * , struct temparature_type * );
+int compute_avg_data(int SUB_FIND_MENU_TYPE, struct user_input_type * , struct temparature_type * );
 
 void showErrMsg(const char *msg , double d_val, int i_val){
   if( i_val == 0 && d_val !=0.0 )
@@ -119,15 +120,13 @@ int show_monthly_day_avg(int flg_type, struct user_input_type *user_input , stru
 #endif 
 	return 0;
 }
-
-
 //TODO;使わないかも
 int find_max_data_12(int flg_type, struct temparature_type *temara_data, double *ret_data )
 {
 	int i;
 	double tmp;
 	
-	switch(SUBFINDMENU){
+	switch(SUB_FIND_MENU){
 		case FIND_MENU_AGV_DAY:
 		tmp = temara_data[0].day_avg;
 		for(i=1; i<12; i++){
@@ -141,23 +140,23 @@ int find_max_data_12(int flg_type, struct temparature_type *temara_data, double 
 		break;
 		
 		case FIND_MENU_AGV_MAX:
-		SUBFINDMENU=FIND_MENU_AGV_MAX;
+		SUB_FIND_MENU=FIND_MENU_AGV_MAX;
 		break;
 		
 		case FIND_MENU_AGV_MIN:
-		SUBFINDMENU=FIND_MENU_AGV_MIN;
+		SUB_FIND_MENU=FIND_MENU_AGV_MIN;
 		break;
 		
 		case FIND_MENU_MAX_DATA:
-		SUBFINDMENU=FIND_MENU_MAX_DATA;
+		SUB_FIND_MENU=FIND_MENU_MAX_DATA;
 		break;
 		
 		case FIND_MENU_MIN_DATA:
-		SUBFINDMENU=FIND_MENU_MIN_DATA;
+		SUB_FIND_MENU=FIND_MENU_MIN_DATA;
 		break;
 		
 		case FIND_MENU_EXIT_SUB:
-		SUBFINDMENU=FIND_MENU_EXIT_SUB;
+		SUB_FIND_MENU=FIND_MENU_EXIT_SUB;
 		break;
 		
 
@@ -174,7 +173,6 @@ int find_max_data_12(int flg_type, struct temparature_type *temara_data, double 
 
 	return 0;
 }
-
 
 int main(int argc, const char * argv[]) {
 #if DEBUG  == 1
@@ -321,12 +319,14 @@ int main(int argc, const char * argv[]) {
 				printf("Read all the tempara_data\n");
 #endif
 				/*Sub Menu*/
-				SUBFINDMENU = show_find_menu();
+				SUB_FIND_MENU = show_find_menu();
 				/*User Input*/
 				set_input_date_period(&user_input);
 				//TODO:find_max_dataを呼び出し
-				double max_val;
-				find_max_data(SUBFINDMENU, &user_input, tempara_data_all, &max_val);
+				//double max_val;
+				//find_max_data(SUB_FIND_MENU, &user_input, tempara_data_all, &max_val);
+				find_max_data(SUB_FIND_MENU, &user_input, tempara_data_all);
+				
 				break;
 				
 			case COMPUTE_AVG_DATA:
@@ -606,7 +606,7 @@ int set_input_date_period( struct user_input_type *user_input){
 
 //TODO:find_max_data本体 
 //TODO:double *ret_data いらない。。。
-int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, struct temparature_type *temara_data, double *ret_data ){
+int find_max_data(int SUB_FIND_MENU_TYPE, struct user_input_type *user_input, struct temparature_type *temara_data  ){
 #if DEBUG  == 1
 	printf("find_max_data-------------------\n");
 #endif
@@ -622,11 +622,11 @@ int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, stru
 	int max_year  = wk_from_year; 
 	int max_month = temara_data[i_start].month;
 
-	SUBFINDMENU = SUBFINDMENU_TYPE;
-	switch( SUBFINDMENU ){
+	SUB_FIND_MENU = SUB_FIND_MENU_TYPE;
+	switch( SUB_FIND_MENU ){
 			case FIND_MENU_AGV_DAY :
 #if DEBUG  == 1
-				printf("SUBFINDMENU=FIND_MENU_AGV_DAY\n");
+				printf("SUB_FIND_MENU=FIND_MENU_AGV_DAY\n");
 				printf("Debugging----------------------\n");
 				printf("i[=i_start]=%d\n", i_start);
 				printf("day_avg[=max_val]=%lf\n", max_val);
@@ -661,7 +661,7 @@ int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, stru
 			
 			case FIND_MENU_AGV_MAX:
 #if DEBUG  == 1
-				printf("SUBFINDMENU=FIND_MENU_AGV_MAX\n");
+				printf("SUB_FIND_MENU=FIND_MENU_AGV_MAX\n");
 				printf("Debugging----------------------\n");
 				printf("i[=i_start]=%d\n", i_start);
 				printf("day_max[=max_val]=%lf\n", max_val);
@@ -693,7 +693,7 @@ int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, stru
 			
 			case FIND_MENU_AGV_MIN:
 #if DEBUG  == 1
-				printf("SUBFINDMENU=FIND_MENU_AGV_MIN\n");
+				printf("SUB_FIND_MENU=FIND_MENU_AGV_MIN\n");
 				printf("Debugging----------------------\n");
 				printf("i[=i_start]=%d\n", i_start);
 				printf("day_min[=max_val]=%lf\n", max_val);
@@ -725,7 +725,7 @@ int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, stru
 			
 			case FIND_MENU_MAX_DATA:
 #if DEBUG  == 1
-				printf("SUBFINDMENU=FIND_MENU_MAX_DATA\n");
+				printf("SUB_FIND_MENU=FIND_MENU_MAX_DATA\n");
 				printf("Debugging----------------------\n");
 				printf("i[=i_start]=%d\n", i_start);
 				printf("month_max[=max_val]=%lf\n", max_val);
@@ -757,7 +757,205 @@ int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, stru
 			
 			case FIND_MENU_MIN_DATA:
 #if DEBUG  == 1
-				printf("SUBFINDMENU=FIND_MENU_MIN_DATA\n");
+				printf("SUB_FIND_MENU=FIND_MENU_MIN_DATA\n");
+				printf("Debugging----------------------\n");
+				printf("i[=i_start]=%d\n", i_start);
+				printf("month_min[=max_val]=%lf\n", max_val);
+				printf("Debugging----------------------\n");
+#endif
+				menu_type="MIN_DATA";
+				max_val=temara_data[i_start].month_min;
+       			 while( i_cnt+1 < i_end ){
+					--wk_from_year;
+        			i=(user_input->month-1) +12*(2016 - wk_from_year ) ;
+					if(max_val < temara_data[i].month_min){
+						max_year  = wk_from_year; 
+						max_month = temara_data[i].month;
+						max_val=temara_data[i].month_min;
+					}
+#if DEBUG  == 1
+					printf("Debugging----------------------\n");
+					printf("month_min=%lf\n", temara_data[i].month_min);
+  					printf("i_cnt=%d\n", i_cnt);
+					printf("i=%d\n", i);
+					printf("i_end=%d\n", i_end);
+					println();
+					printf("Debugging----------------------\n");
+#endif
+					++i_cnt;
+				}
+				break;
+			
+			case FIND_MENU_EXIT_SUB:
+			//TODO:いらない？
+#if DEBUG  == 1
+				printf("SUB_FIND_MENU=FIND_MENU_EXIT_SUB\n");
+#endif
+				break;
+        }
+	//TODO:リターンしない？
+	//*ret_data=max_val;
+	
+	printf("--------MAX DATA[%s]-------------\n",menu_type);
+	printf("%d/%d\n", max_year,max_month );
+	printf("%.2lf\n", max_val );
+	printf("---------------------------------\n");
+	
+	return 0; 
+}
+
+int compute_avg_data(int SUB_FIND_MENU_TYPE, struct user_input_type *user_input, struct temparature_type *temara_data  ){
+#if DEBUG  == 1
+	printf("find_max_data-------------------\n");
+#endif
+	int wk_from_year = user_input->from_year;
+	int period = user_input->from_year - user_input->to_year + 1;
+	int i_end = period;
+	int i_cnt=0;
+	int i=0;
+	int i_start= (user_input->month-1) +12*(2016 - wk_from_year );
+	char *menu_type;
+	
+	double max_val=0.0;
+	int max_year  = wk_from_year; 
+	int max_month = temara_data[i_start].month;
+
+	SUB_FIND_MENU = SUB_FIND_MENU_TYPE;
+	switch( SUB_FIND_MENU ){
+			case FIND_MENU_AGV_DAY :
+#if DEBUG  == 1
+				printf("SUB_FIND_MENU=FIND_MENU_AGV_DAY\n");
+				printf("Debugging----------------------\n");
+				printf("i[=i_start]=%d\n", i_start);
+				printf("day_avg[=max_val]=%lf\n", max_val);
+				printf("Debugging----------------------\n");
+#endif
+				menu_type="AVG DATA";
+				max_val=temara_data[i_start].day_avg;
+       			 while( i_cnt+1 < i_end ){
+					--wk_from_year;
+        			i=(user_input->month-1) +12*(2016 - wk_from_year ) ;
+					if(max_val < temara_data[i].day_avg){
+						//find!
+						max_year  = wk_from_year; 
+						max_month = temara_data[i].month;
+						max_val   =temara_data[i].day_avg;
+					}
+
+#if DEBUG  == 1
+					printf("Debugging----------------------\n");
+					printf("day_avg=%lf\n", temara_data[i].day_avg);
+  					printf("i_cnt=%d\n", i_cnt);
+					printf("i=%d\n", i);
+					printf("i_end=%d\n", i_end);
+					println();
+					printf("Debugging----------------------\n");
+  		
+#endif
+					++i_cnt;
+				}
+				printf("\n");
+				break;
+			
+			case FIND_MENU_AGV_MAX:
+#if DEBUG  == 1
+				printf("SUB_FIND_MENU=FIND_MENU_AGV_MAX\n");
+				printf("Debugging----------------------\n");
+				printf("i[=i_start]=%d\n", i_start);
+				printf("day_max[=max_val]=%lf\n", max_val);
+				printf("Debugging----------------------\n");
+#endif
+				menu_type="AVG MAX";
+				max_val=temara_data[i_start].day_max;
+       			 while( i_cnt+1 < i_end ){
+					--wk_from_year;
+        			i=(user_input->month-1) +12*(2016 - wk_from_year ) ;
+					if(max_val < temara_data[i].day_max){
+						max_year  = wk_from_year; 
+						max_month = temara_data[i].month;
+						max_val=temara_data[i].day_max;
+					}
+
+#if DEBUG  == 1
+					printf("Debugging----------------------\n");
+					printf("day_max=%lf\n", temara_data[i].day_max);
+  					printf("i_cnt=%d\n", i_cnt);
+					printf("i=%d\n", i);
+					printf("i_end=%d\n", i_end);
+					println();
+					printf("Debugging----------------------\n");
+#endif
+					++i_cnt;
+				}
+				break;
+			
+			case FIND_MENU_AGV_MIN:
+#if DEBUG  == 1
+				printf("SUB_FIND_MENU=FIND_MENU_AGV_MIN\n");
+				printf("Debugging----------------------\n");
+				printf("i[=i_start]=%d\n", i_start);
+				printf("day_min[=max_val]=%lf\n", max_val);
+				printf("Debugging----------------------\n");
+#endif
+				menu_type="AVG MIN";
+				max_val=temara_data[i_start].day_min;
+       			 while( i_cnt+1 < i_end ){
+					--wk_from_year;
+        			i=(user_input->month-1) +12*(2016 - wk_from_year ) ;
+					if(max_val < temara_data[i].day_min){
+						max_year  = wk_from_year; 
+						max_month = temara_data[i].month;
+						max_val=temara_data[i].day_min;
+					}
+
+#if DEBUG  == 1
+					printf("Debugging----------------------\n");
+					printf("day_min=%lf\n", temara_data[i].day_min);
+  					printf("i_cnt=%d\n", i_cnt);
+					printf("i=%d\n", i);
+					printf("i_end=%d\n", i_end);
+					println();
+					printf("Debugging----------------------\n");
+#endif
+					++i_cnt;
+				}
+				break;
+			
+			case FIND_MENU_MAX_DATA:
+#if DEBUG  == 1
+				printf("SUB_FIND_MENU=FIND_MENU_MAX_DATA\n");
+				printf("Debugging----------------------\n");
+				printf("i[=i_start]=%d\n", i_start);
+				printf("month_max[=max_val]=%lf\n", max_val);
+				printf("Debugging----------------------\n");
+#endif
+				menu_type="MAX_DATA";
+				max_val=temara_data[i_start].month_max;
+       			 while( i_cnt+1 < i_end ){
+					--wk_from_year;
+        			i=(user_input->month-1) +12*(2016 - wk_from_year ) ;
+					if(max_val < temara_data[i].month_max){
+						max_year  = wk_from_year; 
+						max_month = temara_data[i].month;
+						max_val=temara_data[i].month_max;
+					}
+
+#if DEBUG  == 1
+					printf("Debugging----------------------\n");
+					printf("month_max=%lf\n", temara_data[i].month_max);
+  					printf("i_cnt=%d\n", i_cnt);
+					printf("i=%d\n", i);
+					printf("i_end=%d\n", i_end);
+					println();
+					printf("Debugging----------------------\n");
+#endif
+					++i_cnt;
+				}
+				break;
+			
+			case FIND_MENU_MIN_DATA:
+#if DEBUG  == 1
+				printf("SUB_FIND_MENU=FIND_MENU_MIN_DATA\n");
 				printf("Debugging----------------------\n");
 				printf("i[=i_start]=%d\n", i_start);
 				printf("month_min[=max_val]=%lf\n", max_val);
@@ -788,18 +986,15 @@ int find_max_data(int SUBFINDMENU_TYPE, struct user_input_type *user_input, stru
 			
 			case FIND_MENU_EXIT_SUB://TODO:いらない？
 #if DEBUG  == 1
-				printf("SUBFINDMENU=FIND_MENU_EXIT_SUB\n");
+				printf("SUB_FIND_MENU=FIND_MENU_EXIT_SUB\n");
 #endif
 				break;
         }
-	//TODO:リターンしない？
-	*ret_data=max_val;
 	
-	printf("--------MAX DATA[%s]-------------\n",menu_type);
+	printf("--------AVG DATA[%s]-------------\n",menu_type);
 	printf("%d/%d\n", max_year,max_month );
-	printf("%lf\n", *ret_data );
+	//printf("%lf\n", *ret_data );
 	printf("---------------------------------\n");
 	
 	return 0; 
 }
-
